@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 public class UserController {
     @Autowired
     private UserService userService; 
-
+    
     // find user by id
     @GetMapping("/api/user/id/{userId}")
     public ResponseEntity<User> getUserById(@PathVariable long userId) {
@@ -39,7 +39,7 @@ public class UserController {
         return new ResponseEntity<User>(user.get(), HttpStatus.FOUND); 
     }
     
-
+    
     // find by name
     @GetMapping("/api/user/name/{uName}")
     public ResponseEntity<?> getUserByName(@PathVariable String uName) {
@@ -47,10 +47,10 @@ public class UserController {
         if(!user.isPresent()){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
         }
-        return new ResponseEntity<User>(user.get(), HttpStatus.FOUND);
+        return new ResponseEntity<User>(user.get(), HttpStatus.OK);
     }
     
-
+    
     @PostMapping("/api/user")
     public ResponseEntity<?> addUser(@RequestBody User user) {
         boolean userExists = this.userService.getUserByName(user.getUserName()).isPresent(); 

@@ -9,31 +9,40 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @AllArgsConstructor @NoArgsConstructor
 @Data
 @Entity
-public class FileData {
+public class File {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id; 
+    @Getter @Setter
+    private Long id; 
+    
+    @Column(name = "name", nullable = false, unique = true)
+    @Getter @Setter private String fileName; 
 
     // @Column(unique = true) private String name; 
-    @Column(nullable = false)
-    private String extension;
+    @Column(name="ext",nullable = false, length = 4)
+    @Getter @Setter private String extension;
     
-    
-    @OneToOne
-    @JoinColumn(name="creator", referencedColumnName = "id")
-    private User creator;
-    
-    @OneToMany(mappedBy = "fileId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Chunk> chunks; 
+    @Column(name="mime", nullable = false, length = 20)
+    @Getter @Setter public String mimeType; 
 
+
+    @ManyToOne
+    @JoinColumn(name="creator", referencedColumnName = "id", nullable = false)
+    @Getter @Setter private User creator;
+    
+    
+    
 }
