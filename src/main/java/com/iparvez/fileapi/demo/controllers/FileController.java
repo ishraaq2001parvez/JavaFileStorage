@@ -45,7 +45,7 @@ public class FileController {
 
 
     // mappings
-    @PostMapping(path = "/api/file")
+    @PostMapping(path = "/api/file/create")
     public ResponseEntity<?> postFile(@RequestBody byte[] blob, 
         @RequestHeader("X-File-Name") String fileName, 
         @RequestHeader("X-Chunk-Index") short chunkIndex, 
@@ -56,19 +56,25 @@ public class FileController {
             Optional<User> currentUser = this.fileService.getCreator("napoleon"); 
             System.out.println("user read"+ currentUser.toString());
             // boolean fileExists= this.fileService.existsByName(fileName); 
-            File file = new File();
-            file.setCreator(currentUser.get());
-            file.setExtension(extension);
-            file.setMimeType(mimeType); 
-            file.setFileName(fileName);
-            this.fileService.createOrSaveFile(file); 
+
+            Optional<File> file = this.fileService.getFileByName(fileName); 
+            if(file.isEmpty()){
+                File newFile = new File();
+                newFile.setCreator(currentUser.get());
+                newFile.setExtension(extension);
+                newFile.setMimeType(mimeType); 
+                newFile.setFileName(fileName);
+                this.fileService.createOrSaveFile(newFile);
+                file = this.fileService.getFileByName(fileName); 
+            }
+            
 
             // file = this.fileService.getFileByName(fileName).get(); 
 
             Chunk chunk = new Chunk(); 
             chunk.setChunkIndex(chunkIndex);
             chunk.setData(blob);
-            chunk.setFile(file);
+            chunk.setFile(file.get());
             this.chunkService.createChunk(chunk); 
             return new ResponseEntity<Chunk>(chunk, HttpStatus.CREATED); 
             
