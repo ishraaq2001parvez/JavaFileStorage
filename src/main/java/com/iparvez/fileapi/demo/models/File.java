@@ -32,10 +32,13 @@ public class File {
     @Getter @Setter private String fileName; 
 
     // @Column(unique = true) private String name; 
-    @Column(name="ext",nullable = false)
+    @Column(name="ext",nullable = false, length = 4)
     @Getter @Setter private String extension;
     
-    
+    @Column(name="mime", nullable = false, length = 20)
+    @Getter @Setter public String mimeType; 
+
+
     @ManyToOne
     @JoinColumn(name="creator", referencedColumnName = "id", nullable = false)
     @Getter @Setter private User creator;

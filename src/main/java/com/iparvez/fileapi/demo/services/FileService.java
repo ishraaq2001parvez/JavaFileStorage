@@ -16,7 +16,7 @@ public class FileService {
     public FileRepo fileRepo; 
 
 
-    public File createFile(File file){
+    public File createOrSaveFile(File file){
         this.fileRepo.save(file);
         return file;  
     }

@@ -4,6 +4,7 @@ import java.util.HexFormat;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -48,21 +49,21 @@ public class FileController {
     public ResponseEntity<?> postFile(@RequestBody byte[] blob, 
         @RequestHeader("X-File-Name") String fileName, 
         @RequestHeader("X-Chunk-Index") short chunkIndex, 
-        @RequestHeader("X-File-Ext") String extension
+        @RequestHeader("X-File-Ext") String extension,
+        @RequestHeader("X-Mime-Type") String mimeType
     ) {
         try {
             Optional<User> currentUser = this.fileService.getCreator("napoleon"); 
-            System.err.println("user read"+ currentUser.toString());
-            boolean fileExists= this.fileService.existsByName(fileName); 
+            System.out.println("user read"+ currentUser.toString());
+            // boolean fileExists= this.fileService.existsByName(fileName); 
             File file = new File();
-            if(!fileExists){
-                file.setCreator(currentUser.get());
-                file.setExtension(extension);
-                file.setFileName(fileName);
-                this.fileService.createFile(file); 
-            }
+            file.setCreator(currentUser.get());
+            file.setExtension(extension);
+            file.setMimeType(mimeType); 
+            file.setFileName(fileName);
+            this.fileService.createOrSaveFile(file); 
 
-            file = this.fileService.getFileByName(fileName).get(); 
+            // file = this.fileService.getFileByName(fileName).get(); 
 
             Chunk chunk = new Chunk(); 
             chunk.setChunkIndex(chunkIndex);
@@ -83,19 +84,40 @@ public class FileController {
     }
 
 
-    @GetMapping("/api/file/{chunkId}")
+    @GetMapping("/api/chunk/{chunkId}")
     public ResponseEntity<?> getChunk(@PathVariable long chunkId){
         try {
             Optional<Chunk> chunk = this.chunkService.findById(chunkId); 
             if(chunk.isEmpty()){
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
             }
-            return new ResponseEntity<Chunk>(chunk.get(), HttpStatus.OK); 
+            byte[] data = chunk.get().getData(); 
+            // HttpHeaders headers = new HttpHeaders(); 
+            // headers.add("Content-Length", data.length); 
+            return new ResponseEntity<byte[]>(data, HttpStatus.OK) ; 
+            // return new ResponseEntity<Chunk>(chunk.get(), HttpStatus.OK); 
         } catch (Exception e) {
             // TODO: handle exception
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
         }
     }
+
+    @GetMapping("/api/file/info/{fileId}")
+    public ResponseEntity<?> getFileById(@PathVariable Long fileId) {
+        try {
+            Optional<File> file = this.fileService.getFileById(fileId); 
+            if(file.isEmpty()){
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND) ; 
+            }
+            return new ResponseEntity<File>(file.get(), HttpStatus.ACCEPTED); 
+
+        } catch (Exception e) {
+            // TODO: handle exception
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
+        }
+
+    }
+    
     
     
 }
