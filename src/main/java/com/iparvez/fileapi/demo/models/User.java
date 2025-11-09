@@ -3,6 +3,7 @@ package com.iparvez.fileapi.demo.models;
 import java.util.Collection;
 import java.util.List;
 
+import org.hibernate.annotations.DialectOverride.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -23,7 +24,7 @@ import lombok.Setter;
 @Data
 @Entity
 @Table(name = "creator")
-public class User implements UserDetails{
+public class User implements UserDetails {
     
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
@@ -34,6 +35,7 @@ public class User implements UserDetails{
 
 
     @Column(nullable = false)
+    @org.hibernate.annotations.ColumnDefault("'password'")
     @Setter private String password; 
     // @Column(name = "")
     // @Getter @Setter public Profile profile; 
