@@ -37,10 +37,12 @@ public class User implements UserDetails {
     @Column(nullable = false)
     @org.hibernate.annotations.ColumnDefault("'password'")
     @Setter private String password; 
-    // @Column(name = "")
-    // @Getter @Setter public Profile profile; 
 
+    
 
+    /*
+     * all these methods are needed for spring security
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

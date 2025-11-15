@@ -27,6 +27,7 @@ public class UserConfig {
     @Autowired
     private UserDetailsService userDetailsService; 
     
+    // object for the jwt filter 
     @Autowired private jwtFilter jwtFilter; 
 
     @Bean
@@ -39,6 +40,15 @@ public class UserConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
+        /*
+         * this code
+         * 1. disables csrf
+         * 2. checks for authentication of any http requests
+         * 2.1 except for login and register
+         * 2.2 permit any request to them as authenticated
+         * assigns session creation as stateless
+         * adds a jwt filter to run before the username pw filter
+         */
         httpSecurity
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(request -> request

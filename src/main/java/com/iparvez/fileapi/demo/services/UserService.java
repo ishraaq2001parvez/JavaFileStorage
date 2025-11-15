@@ -22,8 +22,11 @@ public class UserService implements UserDetailsService{
     
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException{
+        /*
+         * just a filler code to implement spring security
+         * checks if user is found
+         */
         Optional<User> user =  this.userRepo.findByName(username); 
-        
         if(user.isEmpty()){
             System.out.println("404 user not found");
             throw new UsernameNotFoundException("404 user not found"); 

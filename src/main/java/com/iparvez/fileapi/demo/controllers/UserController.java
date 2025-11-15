@@ -1,7 +1,9 @@
 package com.iparvez.fileapi.demo.controllers;
 
 import java.util.Optional;
+import java.util.TreeMap;
 
+import org.antlr.v4.runtime.misc.Pair;
 import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,7 +31,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:5173")
 public class UserController {
     @Autowired private UserService userService; 
     
@@ -88,11 +90,10 @@ public class UserController {
         if(!authentication.isAuthenticated()){
             return new ResponseEntity<String>("incorrect credentials", HttpStatus.FORBIDDEN); 
         }
-        
-        return new ResponseEntity<String>(
-            jwtService.generateToken(user.getUsername()), 
-            HttpStatus.ACCEPTED
-        ); 
+        TreeMap<String, String> loginDetails = new TreeMap<>(); 
+        loginDetails.put("userName", user.getUsername()); 
+        loginDetails.put("token", jwtService.generateToken(user.getUsername())); 
+        return new ResponseEntity<>(loginDetails, HttpStatus.OK) ; 
         
         // return entity;
     }
