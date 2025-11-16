@@ -3,21 +3,62 @@ package com.iparvez.fileapi.demo.services;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.iparvez.fileapi.demo.custom.Pair;
+import com.iparvez.fileapi.demo.enums.UserEnum;
 import com.iparvez.fileapi.demo.models.User;
 import com.iparvez.fileapi.demo.repo.UserRepo;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService, UserEnum{
     @Autowired
     private UserRepo userRepo; 
+
     
-    public Optional<User> getUserByName(String name){
-        Optional<User> user = this.userRepo.findByName(name);
+    private BCryptPasswordEncoder bCryptPasswordEncoder =new BCryptPasswordEncoder(10); 
+    
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException{
+        /*
+         * just a filler code to implement spring security
+         * checks if user is found
+         */
+        Optional<User> user =  this.userRepo.findByName(username); 
+        if(user.isEmpty()){
+            System.out.println("404 user not found");
+            throw new UsernameNotFoundException("404 user not found"); 
+        }
+        return user.get();
         
-        return user; 
-    } 
+        
+    }
+
+    public Pair<User, UserEnum.TYPE> getUserByUsername(String username){ 
+        /*
+         * attempt to retrieve a user by username
+         */
+        try {
+            // check if user exists, if exists, return with appropriate type and find it
+            Pair<User, UserEnum.TYPE> result =Pair.of(null, UserEnum.TYPE.NOT_FOUND); 
+            Optional<User> user = this.userRepo.findByName(username);   
+            if(user.isEmpty()){
+                // result = null; 
+                
+                return result ;
+            }  
+            return Pair.of(user.get(), UserEnum.TYPE.FOUND); 
+        } catch (Exception e) {
+            System.err.println(e);
+            return Pair.of(null, UserEnum.TYPE.SERVER_ERROR); 
+        }
+
+    }
     
     public Optional<User> getUserById(Long id){
         Optional<User> user=  this.userRepo.findById(id); 
@@ -25,6 +66,7 @@ public class UserService {
     }
     
     public User createOrUpdateUser(User user){
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         return this.userRepo.save(user); 
     }
     
