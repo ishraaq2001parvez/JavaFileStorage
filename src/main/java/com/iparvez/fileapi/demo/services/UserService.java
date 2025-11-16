@@ -3,17 +3,20 @@ package com.iparvez.fileapi.demo.services;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.iparvez.fileapi.demo.custom.Pair;
+import com.iparvez.fileapi.demo.enums.UserEnum;
 import com.iparvez.fileapi.demo.models.User;
 import com.iparvez.fileapi.demo.repo.UserRepo;
 
 @Service
-public class UserService implements UserDetailsService{
+public class UserService implements UserDetailsService, UserEnum{
     @Autowired
     private UserRepo userRepo; 
 
@@ -36,9 +39,25 @@ public class UserService implements UserDetailsService{
         
     }
 
-    public Optional<User> getUserByUsername(String username){
-        Optional<User> user = this.userRepo.findByName(username); 
-        return user; 
+    public Pair<User, UserEnum.TYPE> getUserByUsername(String username){ 
+        /*
+         * attempt to retrieve a user by username
+         */
+        try {
+            // check if user exists, if exists, return with appropriate type and find it
+            Pair<User, UserEnum.TYPE> result =Pair.of(null, UserEnum.TYPE.NOT_FOUND); 
+            Optional<User> user = this.userRepo.findByName(username);   
+            if(user.isEmpty()){
+                // result = null; 
+                
+                return result ;
+            }  
+            return Pair.of(user.get(), UserEnum.TYPE.FOUND); 
+        } catch (Exception e) {
+            System.err.println(e);
+            return Pair.of(null, UserEnum.TYPE.SERVER_ERROR); 
+        }
+
     }
     
     public Optional<User> getUserById(Long id){

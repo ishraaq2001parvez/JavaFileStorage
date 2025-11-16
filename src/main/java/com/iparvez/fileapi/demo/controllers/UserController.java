@@ -3,9 +3,10 @@ package com.iparvez.fileapi.demo.controllers;
 import java.util.Optional;
 import java.util.TreeMap;
 
-import org.antlr.v4.runtime.misc.Pair;
+
 import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.iparvez.fileapi.demo.custom.Pair;
+import com.iparvez.fileapi.demo.enums.UserEnum;
 import com.iparvez.fileapi.demo.models.User;
 import com.iparvez.fileapi.demo.services.jwtService;
 import com.iparvez.fileapi.demo.services.UserService;
@@ -32,7 +35,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
-public class UserController {
+public class UserController implements UserEnum{
     @Autowired private UserService userService; 
     
     @Autowired private jwtService jwtService; 
@@ -60,39 +63,58 @@ public class UserController {
     // find by name
     @GetMapping("/api/user/name/{uName}")
     public ResponseEntity<?> getUserByName(@PathVariable String uName) {
-        Optional<User> user = this.userService.getUserByUsername(uName);
-        if(user.isEmpty()){
+        Pair<User, TYPE> checkUser = this.userService.getUserByUsername(uName); 
+        // if(che)
+        if(checkUser.getSecond()==TYPE.NOT_FOUND){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
         }
-        return new ResponseEntity<User>(user.get(), HttpStatus.OK);
+        return new ResponseEntity<User>(checkUser.getFirst(), HttpStatus.OK);
     }
     
     // register
     @PostMapping("/api/user/register")
     public ResponseEntity<?> addUser(@RequestBody User user) {
         // System.out.println(user.toString());
-        boolean userExists = this.userService.getUserByUsername(user.getUsername()).isPresent(); 
-        if(userExists){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN); 
+        try{
+            Pair<User, UserEnum.TYPE> checkUser = this.userService.getUserByUsername(user.getUsername()); 
+            if(checkUser.getSecond()==UserEnum.TYPE.FOUND){
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN); 
+            }
+            this.userService.createOrUpdateUser(user); 
+            
+            return new ResponseEntity<String>("user has been created", HttpStatus.OK);
         }
-        this.userService.createOrUpdateUser(user); 
+        catch(Exception e){
+            return new ResponseEntity<>(HttpStatus.BAD_GATEWAY); 
+        }
         
-        return new ResponseEntity<User>(user, HttpStatus.CREATED);
     }
     
     // login
     @PostMapping("/api/user/login")
     public ResponseEntity<?> loginUser(@RequestBody User user) {
+        Pair<User, UserEnum.TYPE> checkUser = this.userService.getUserByUsername(user.getUsername()); 
+        // System.out.println(checkUser.getFirst().toString());
+        if(checkUser.getSecond()==UserEnum.TYPE.SERVER_ERROR){
+            return new ResponseEntity<>(HttpStatus.BAD_GATEWAY); 
+        }
+
+        if(checkUser.getSecond()==UserEnum.TYPE.NOT_FOUND){
+            // System.out.println("hit breakpoint");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
+        }
+        System.out.println(checkUser.getFirst().getUsername());
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
+            new UsernamePasswordAuthenticationToken(
+                user.getUsername(), 
+                user.getPassword()
+            )
         ); 
         
         if(!authentication.isAuthenticated()){
             return new ResponseEntity<String>("incorrect credentials", HttpStatus.FORBIDDEN); 
         }
-        TreeMap<String, String> loginDetails = new TreeMap<>(); 
-        loginDetails.put("userName", user.getUsername()); 
-        loginDetails.put("token", jwtService.generateToken(user.getUsername())); 
+        Pair<String, String> loginDetails= Pair.of(checkUser.getFirst().getUsername(), jwtService.generateToken(user.getUsername())); 
         return new ResponseEntity<>(loginDetails, HttpStatus.OK) ; 
         
         // return entity;
