@@ -50,6 +50,7 @@ public class UserConfig {
          * adds a jwt filter to run before the username pw filter
          */
         httpSecurity
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(request -> request
                     .requestMatchers("/api/user/register", "/api/user/login")

@@ -11,12 +11,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.iparvez.fileapi.demo.custom.Pair;
+import com.iparvez.fileapi.demo.dao.User.UserDao;
 import com.iparvez.fileapi.demo.enums.UserEnum;
 import com.iparvez.fileapi.demo.models.User;
 import com.iparvez.fileapi.demo.repo.UserRepo;
 
 @Service
-public class UserService implements UserDetailsService, UserEnum{
+public class UserService implements UserDetailsService{
     @Autowired
     private UserRepo userRepo; 
 
@@ -39,42 +40,49 @@ public class UserService implements UserDetailsService, UserEnum{
         
     }
 
-    public Pair<User, UserEnum.TYPE> getUserByUsername(String username){ 
+    public UserDao getUserByUsername(String username){ 
         /*
          * attempt to retrieve a user by username
          */
         try {
             // check if user exists, if exists, return with appropriate type and find it
-            Pair<User, UserEnum.TYPE> result =Pair.of(null, UserEnum.TYPE.NOT_FOUND); 
-            Optional<User> user = this.userRepo.findByName(username);   
+            Optional<User> user = this.userRepo.findByName(username) ;
             if(user.isEmpty()){
-                // result = null; 
-                
-                return result ;
-            }  
-            return Pair.of(user.get(), UserEnum.TYPE.FOUND); 
+                return new UserDao(UserEnum.NOT_FOUND); 
+            }
+            return new UserDao(user.get(), UserEnum.FOUND); 
         } catch (Exception e) {
             System.err.println(e);
-            return Pair.of(null, UserEnum.TYPE.SERVER_ERROR); 
+            return new UserDao(UserEnum.SERVER_ERROR); 
         }
 
     }
     
-    public Optional<User> getUserById(Long id){
-        Optional<User> user=  this.userRepo.findById(id); 
-        return user; 
+    public UserDao getUserById(Long id){
+        try {
+            Optional<User> user = this.userRepo.findById(id); 
+            if(user.isEmpty()){
+                return new UserDao(UserEnum.NOT_FOUND); 
+            }
+            return new UserDao(user.get(), UserEnum.FOUND); 
+        } catch (Exception e) {
+            // TODO: handle exception
+            System.err.println(e);
+            return new UserDao(UserEnum.SERVER_ERROR); 
+        }
     }
     
-    public User createOrUpdateUser(User user){
+    public UserDao createOrUpdateUser(User user){
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        return this.userRepo.save(user); 
+        this.userRepo.save(user);
+        return new UserDao(user, UserEnum.CREATED) ;
     }
     
-    public boolean deleteUser(long id){
+    public UserDao deleteUser(long id){
         if(!this.userRepo.existsById(id)){
-            return false; 
+            return new UserDao(UserEnum.NOT_FOUND); 
         }
         this.userRepo.deleteById(id);
-        return true; 
+        return new UserDao(UserEnum.DELETED);
     }
 }

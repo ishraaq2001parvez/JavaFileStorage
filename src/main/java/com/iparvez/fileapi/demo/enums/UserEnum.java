@@ -1,11 +1,10 @@
 package com.iparvez.fileapi.demo.enums;
 
-public interface UserEnum {
-    public enum TYPE {
-        FOUND, 
-        NOT_FOUND,
-        SERVER_ERROR
-    }
-    
+public enum UserEnum {
+    FOUND, 
+    NOT_FOUND,
+    SERVER_ERROR, 
+    CREATED,
+    UPDATED, 
+    DELETED,
 }
-

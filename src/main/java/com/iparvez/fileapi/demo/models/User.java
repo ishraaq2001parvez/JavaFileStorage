@@ -3,7 +3,8 @@ package com.iparvez.fileapi.demo.models;
 import java.util.Collection;
 import java.util.List;
 
-import org.hibernate.annotations.DialectOverride.ColumnDefault;
+import org.hibernate.annotations.ColumnDefault;
+// import org.hibernate.annotations.DialectOverride.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -35,7 +36,7 @@ public class User implements UserDetails {
 
 
     @Column(nullable = false)
-    @org.hibernate.annotations.ColumnDefault("'password'")
+    @ColumnDefault("'password'")
     @Setter private String password; 
 
     

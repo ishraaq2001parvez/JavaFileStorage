@@ -6,6 +6,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -17,18 +19,15 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 @Service
 public class jwtService {
 
-    private static final String SECRET = "TmV3U2VjcmV0S2V5Rm9ySldUU2lnbmluZ1B1cnBvc2VzMTIzNDU2Nzg=\r\n";
+    @Value("${jwt.secret.key}")
+    private String secretKey; 
 
-    private String secretKey;
-
-    public jwtService(){
-        secretKey = generateSecretKey();
-    }
 
     public String generateSecretKey() {
         try {
@@ -44,13 +43,16 @@ public class jwtService {
     public String generateToken(String username) {
 
         Map<String, Object> claims = new HashMap<>();
-
-        return Jwts.builder()
+        long oneWeekMillis = TimeUnit.DAYS.toMillis(7); 
+        String jwtToken = Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000*60*30))
+                .setExpiration(new Date(System.currentTimeMillis() + oneWeekMillis))
                 .signWith(getKey(), SignatureAlgorithm.HS256).compact();
+        
+        
+        return jwtToken ;
 
     }
 
