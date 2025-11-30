@@ -1,39 +1,31 @@
 package com.iparvez.fileapi.demo.controllers;
 
 
-import java.util.Optional;
-import java.util.TreeMap;
-
-
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.iparvez.fileapi.demo.configs.UserConfig;
-import com.iparvez.fileapi.demo.custom.Pair;
 import com.iparvez.fileapi.demo.dao.User.UserDao;
+import com.iparvez.fileapi.demo.dao.User.UserJwtDto;
 import com.iparvez.fileapi.demo.dao.User.UserLoginDto;
 import com.iparvez.fileapi.demo.dao.User.UserUpdateDto;
 import com.iparvez.fileapi.demo.enums.UserEnum;
 import com.iparvez.fileapi.demo.models.User;
-import com.iparvez.fileapi.demo.services.jwtService;
 import com.iparvez.fileapi.demo.services.UserService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PutMapping;
+import com.iparvez.fileapi.demo.services.jwtService;
 
 
 @RestController
@@ -125,12 +117,12 @@ public class UserController {
         if(!authentication.isAuthenticated()){
             return new ResponseEntity<>(new UserDao(UserEnum.NOT_FOUND), HttpStatus.NOT_ACCEPTABLE); 
         }
-        HttpHeaders headers = new HttpHeaders(); 
-        headers.add("X-JWT-Token-Response", this.jwtService.generateToken(
+        final String jwtToken = this.jwtService.generateToken(
             loginDetails.getUserName()
-        )); 
-        System.out.println(headers.toString());
-        return new ResponseEntity<>(userDetails,headers, HttpStatus.OK) ; 
+        );
+        
+        final UserJwtDto userJwtDto = new UserJwtDto(userDetails.getUser(), UserEnum.FOUND, jwtToken); 
+        return new ResponseEntity<>(userJwtDto, HttpStatus.OK) ; 
         
         // return entity;
     }
@@ -169,7 +161,7 @@ public class UserController {
             userdetails.setStatus(UserEnum.UPDATED);
             return new ResponseEntity<>(userdetails, HttpStatus.OK) ;
         } catch (Exception e) {
-            // TODO: handle exception
+            
             System.err.println(e);
             return new ResponseEntity<>(new UserDao(UserEnum.SERVER_ERROR), HttpStatus.BAD_GATEWAY); 
         }

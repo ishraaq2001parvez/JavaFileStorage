@@ -1,4 +1,4 @@
-package com.iparvez.fileapi.demo.dao;
+package com.iparvez.fileapi.demo.dao.File;
 
 import com.iparvez.fileapi.demo.models.File;
 import com.iparvez.fileapi.demo.models.User;

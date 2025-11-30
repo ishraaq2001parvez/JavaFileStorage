@@ -11,7 +11,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.iparvez.fileapi.demo.models.User;
 import com.iparvez.fileapi.demo.services.UserService;
 import com.iparvez.fileapi.demo.services.jwtService;
 

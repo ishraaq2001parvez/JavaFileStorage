@@ -11,43 +11,27 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
-@AllArgsConstructor @NoArgsConstructor
 @Data
 @Entity
-public class File {
+public class Directory {
     // id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter @Setter
     @Column(name = "id")
-    private Long file_id; 
-    
-    // name of file
-    @Column(name = "name", nullable = false, unique = true)
-    @Getter @Setter private String fileName; 
+    private Long dir_id; 
 
-    // extension 
-    @Column(name="ext",nullable = false, length = 4)
-    @Getter @Setter private String extension;
-    
-    // mimeType used for saving file 
-    @Column(name="mime", nullable = false, length = 20)
-    @Getter @Setter private String mimeType; 
+    @Getter @Setter private String name; 
 
-
-    // map user creator
     @ManyToOne
-    @JoinColumn(name="creator", referencedColumnName = "id", nullable = false)
-    @Getter @Setter private User creator;
+    @JoinColumn(name = "parent_id")
+    private Directory parent;
 
-    // access type of file 
+    // access type of dir 
     // 3 values - {0 : private, 1: protected, 2: public}
     @Column(name = "access_type", nullable = false)
     @Getter @Setter private int accessType; 
@@ -55,14 +39,11 @@ public class File {
     // define users who have access 
     @ManyToMany
     @JoinTable(
-        name = "users_access", 
-        joinColumns = @JoinColumn(name="file_id"),
+        name = "dir_access", 
+        joinColumns = @JoinColumn(name="dir_id"),
         inverseJoinColumns = @JoinColumn(name ="id")
     )
     @Getter @Setter private Set<User> usersGranted; 
 
-    @ManyToOne
-    @JoinColumn(name = "dir", referencedColumnName = "id")
-    @Getter @Setter private Directory dir;    
-    
+
 }

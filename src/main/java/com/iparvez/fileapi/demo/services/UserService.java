@@ -3,14 +3,12 @@ package com.iparvez.fileapi.demo.services;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.iparvez.fileapi.demo.custom.Pair;
 import com.iparvez.fileapi.demo.dao.User.UserDao;
 import com.iparvez.fileapi.demo.enums.UserEnum;
 import com.iparvez.fileapi.demo.models.User;
@@ -66,7 +64,7 @@ public class UserService implements UserDetailsService{
             }
             return new UserDao(user.get(), UserEnum.FOUND); 
         } catch (Exception e) {
-            // TODO: handle exception
+            
             System.err.println(e);
             return new UserDao(UserEnum.SERVER_ERROR); 
         }
