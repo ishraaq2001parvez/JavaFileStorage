@@ -49,6 +49,9 @@ public class File {
 
     // access type of file 
     // 3 values - {0 : private, 1: protected, 2: public}
+    // only creator can access private dir (default when creation)
+    // you need to raise message to access protected dir
+    // public dir is accessible by all
     @Column(name = "access_type", nullable = false)
     @Getter @Setter private int accessType; 
 
