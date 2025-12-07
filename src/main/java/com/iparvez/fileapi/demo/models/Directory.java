@@ -1,10 +1,12 @@
 package com.iparvez.fileapi.demo.models;
 
 import java.util.Set;
-import java.util.TreeSet;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -31,15 +33,26 @@ public class Directory {
 
 
     /* parent of directory */
-    @ManyToOne
+    @ManyToOne(
+        fetch = FetchType.LAZY
+    )
     @JoinColumn(name = "parent_id")
-    @Getter @Setter private Directory parent;
+    @Getter @Setter @JsonIgnore private Directory parent;
+    /* method to expose id while using jsonignore */
+    public Long getParentId(){
+        return this.parent == null ? null : this.parent.getDir_id(); 
+    }
 
     /*creator of directory */
-    @ManyToOne
+    @ManyToOne(
+        fetch = FetchType.LAZY
+    )
     @JoinColumn(name = "creator_id")
-    @Getter @Setter private User creator; 
-
+    @Getter @Setter @JsonIgnore private User creator; 
+    /* method to expose id while using jsonignore */
+    public Long getCreatorId(){
+        return this.getCreator().getId(); 
+    }
 
 
     // access type of dir 
@@ -51,23 +64,27 @@ public class Directory {
     @Getter @Setter private int accessType; 
 
     // define users who have  read access 
-    @ManyToMany
+    @ManyToMany(
+        fetch = FetchType.EAGER
+    )
     @JoinTable(
         name = "dir_read_access", 
         joinColumns = @JoinColumn(name="dir_id"),
         inverseJoinColumns = @JoinColumn(name ="id")
     )
-    @Getter @Setter private TreeSet<User> usersGrantedRead; 
+    @Getter @Setter private Set<User> usersGrantedRead; 
     
 
     // define users who have  read access 
-    @ManyToMany
+    @ManyToMany(
+        fetch = FetchType.LAZY
+    )
     @JoinTable(
         name = "dir_write_access", 
         joinColumns = @JoinColumn(name="dir_id"),
         inverseJoinColumns = @JoinColumn(name ="id")
     )
-    @Getter @Setter private TreeSet<User> usersGrantedWrite; 
+    @Getter @Setter private Set<User> usersGrantedWrite; 
 
 
 }

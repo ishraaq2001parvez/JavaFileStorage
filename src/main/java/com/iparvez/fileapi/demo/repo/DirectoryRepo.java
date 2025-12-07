@@ -18,7 +18,7 @@ public interface DirectoryRepo extends JpaRepository <Directory, Long>{
     /* 3 inner joins, to get parents, and then to get creators */
     /* this works, because we select by username AND parent name */
     /* so even if another user has a same directory, it will return false */
-    @Query(value = "select count(d.id) from directory "+
+    @Query(value = "select count(d.id) from directory d"+
                     " where d.parent_id= :parent_id and d.creator_id= :creator_id"+
                     " and d.name = :directoryName"
     , nativeQuery = true)
@@ -33,9 +33,8 @@ public interface DirectoryRepo extends JpaRepository <Directory, Long>{
     /* 3 inner joins, to get parents, and then to get creators */
     /* this works, because we select by username AND parent name */
     /* so even if another user has a same directory, it will return false */
-    @Query(value = "select d.* from directory "+
-                    " where d.parent_id= :parent_id and d.creator_id= :creator_id"+
-                    " and d.name = :directoryName"
+    @Query(value = "select d.* from directory d"+
+                    " where d.parent_id= :parent_id and d.creator_id= :creator_id"
     , nativeQuery = true)
     ArrayList<Directory> findAll_by_parentId_and_creatorId(
         @Param("parent_id") Long parent_id, 
@@ -44,18 +43,22 @@ public interface DirectoryRepo extends JpaRepository <Directory, Long>{
 
 
     /* get creator via id */
-    @Query(value = "select c.* from creator"+
-                    " where creator.id = :creator_id", 
+    @Query(value = "select c.* from creator c"+
+                    " where c.id = :creator_id", 
             nativeQuery = true
     )
     Optional<User> findByCreatorId(
         @Param("creator_id") Long creator_id
     ); 
 
-    
+    /* get parent directory by creator id */
+    @Query(value = "select p.* from directory p where p.creator_id = :creator_id and p.parent_id is null"
+        , nativeQuery = true
+    )
+    Optional<Directory> findParentByCreatorId(
+        @Param("creator_id") Long creator_id
+    ); 
+
 
     
-
-
-
 }

@@ -23,7 +23,7 @@ import lombok.Setter;
 @Data
 @Entity
 @Table(name = "creator")
-public class User implements UserDetails {
+public class User implements UserDetails, Comparable<User> {
     
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
@@ -37,11 +37,11 @@ public class User implements UserDetails {
     @ColumnDefault("'password'")
     @Setter private String password; 
 
-
-    
-
-
-    
+    /* compare to method */
+    @Override
+    public int compareTo(User user){
+        return Long.compare(this.getId(), user.getId()); 
+    }
 
     /*
      * all these methods are needed for spring security
