@@ -31,6 +31,8 @@ public class Directory {
     /*name of directory */
     @Getter @Setter private String name; 
 
+    /* path to directory */
+    /* to implement */
 
     /* parent of directory */
     @ManyToOne(
@@ -45,14 +47,10 @@ public class Directory {
 
     /*creator of directory */
     @ManyToOne(
-        fetch = FetchType.LAZY
+        fetch = FetchType.EAGER
     )
     @JoinColumn(name = "creator_id")
-    @Getter @Setter @JsonIgnore private User creator; 
-    /* method to expose id while using jsonignore */
-    public Long getCreatorId(){
-        return this.getCreator().getId(); 
-    }
+    @Getter @Setter private User creator; 
 
 
     // access type of dir 

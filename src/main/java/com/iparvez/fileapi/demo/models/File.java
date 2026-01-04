@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -41,6 +42,14 @@ public class File {
     @Column(name="mime", nullable = false, length = 20)
     @Getter @Setter private String mimeType; 
 
+    // file metadata object
+    @OneToOne
+    @JoinColumn(
+        name = "file_metadata", 
+        referencedColumnName = "id", 
+        nullable = false
+    )
+    @Getter @Setter private FileMetaData fileMetaData ;
 
     // map user creator
     @ManyToOne

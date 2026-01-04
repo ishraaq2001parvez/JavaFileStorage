@@ -12,6 +12,7 @@ import lombok.Setter;
 
 @AllArgsConstructor @NoArgsConstructor
 public class DirectoryGetAllFromParentDto {
+    @Getter @Setter private Directory currentDirectory ;
     @Getter @Setter private List<Directory> directories; 
     @Getter @Setter private DirectoryEnum status;
 }

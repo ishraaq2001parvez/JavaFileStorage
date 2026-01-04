@@ -26,6 +26,7 @@ public class DirectoryService {
         Long parent_id, 
         Long creator_id
     ){
+        System.out.printf("%s %d %d", directoryName, parent_id, creator_id);
         Long countDir_by_parentName_and_creatorName = this.directoryRepo.count_by_directoryName_and_parentId_and_creatorId(
             directoryName, parent_id, creator_id
         ); 
@@ -34,17 +35,28 @@ public class DirectoryService {
     }
     
     /* create or update directory */
-    public DirectoryCreateOutDto createDirectory(DirectoryCreateClientDto directoryCreateClientDto){
+    public DirectoryCreateOutDto createDirectory(
+        DirectoryCreateClientDto directoryCreateClientDto, 
+        User creator
+    ){
         try {
             /* create dto for sending out data */
             DirectoryCreateOutDto directoryCreateOutDto = new DirectoryCreateOutDto(); 
 
-            /* get the parent and the creator items */
+            /* check if directory exists */
+            if(checkIf_Directory_Exists_by_parentId_and_creatorId(
+                directoryCreateClientDto.getDirectory_name(), 
+                directoryCreateClientDto.getParent_id(), 
+                creator.getId()
+            )){
+                /* this means directory exists */
+                /* set the status to not acceptable and return */
+                directoryCreateOutDto.setStatus(DirectoryEnum.NOT_ACCEPTABLE);
+                return directoryCreateOutDto ;
+            }
+            /* get the parent directory*/
             Optional<Directory> parent = this.directoryRepo.findById(
                 directoryCreateClientDto.getParent_id()
-            ); 
-            Optional<User> creator = this.directoryRepo.findByCreatorId(
-                directoryCreateClientDto.getCreator_id()
             ); 
             /* create the actual directory */
             Directory createdDirectory = new Directory(); 
@@ -52,7 +64,7 @@ public class DirectoryService {
                 directoryCreateClientDto.getDirectory_name()
             );
             createdDirectory.setAccessType(directoryCreateClientDto.getAccessType());
-            createdDirectory.setCreator(creator.get());
+            createdDirectory.setCreator(creator);
             createdDirectory.setParent(parent.get());
             createdDirectory.setUsersGrantedRead(new TreeSet<User>());
             createdDirectory.setUsersGrantedWrite(new TreeSet<User>());
@@ -67,6 +79,7 @@ public class DirectoryService {
             /* return final dto */
             return directoryCreateOutDto ;
         } catch (Exception e) {
+            System.err.println(e.getMessage());
             return new DirectoryCreateOutDto(DirectoryEnum.SERVER_ERROR); 
         }
     }
@@ -138,7 +151,7 @@ public class DirectoryService {
     }
 
     /* get directory contents */
-    /* with parent */
+    /* without parent */
     public DirectoryGetAllFromParentDto getAllDirectoriesFromParent(
         Long creatorId
     ){
@@ -170,7 +183,7 @@ public class DirectoryService {
         }
     }
 
-    /*without parent */
+    /*with parent */
     public DirectoryGetAllFromParentDto getAllDirectoriesFromParent(
         Long creatorId, Long parentId
     ){
@@ -190,6 +203,8 @@ public class DirectoryService {
                     creatorId
                 )
             );
+            /* set the current directory */
+            directoryGetAllFromParentDto.setCurrentDirectory(parentDir.get());
             /* set status and return */
             directoryGetAllFromParentDto.setStatus(DirectoryEnum.FOUND);
             return directoryGetAllFromParentDto; 
