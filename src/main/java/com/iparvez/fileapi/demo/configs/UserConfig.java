@@ -49,7 +49,12 @@ public class UserConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(request -> request
-                    .requestMatchers("/api/user/register", "/api/user/login")
+                    .requestMatchers(
+                        "/api/user/register", 
+                        "/api/user/login", 
+                        "/api/user/check_user", 
+                        "/api/user/forgot_password"
+                    )
                     .permitAll()
                     .anyRequest().authenticated()
                 )

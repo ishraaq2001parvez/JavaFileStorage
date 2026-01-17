@@ -2,6 +2,9 @@ package com.iparvez.fileapi.demo.models;
 
 import java.util.Set;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -39,6 +42,7 @@ public class Directory {
         fetch = FetchType.LAZY
     )
     @JoinColumn(name = "parent_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @Getter @Setter @JsonIgnore private Directory parent;
     /* method to expose id while using jsonignore */
     public Long getParentId(){

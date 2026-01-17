@@ -10,6 +10,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.iparvez.fileapi.demo.dao.User.UserDao;
+import com.iparvez.fileapi.demo.dao.User.UserPasswordChangeRequestDto;
+import com.iparvez.fileapi.demo.dao.User.UserPasswordChangeResponseDto;
 import com.iparvez.fileapi.demo.enums.UserEnum;
 import com.iparvez.fileapi.demo.models.User;
 import com.iparvez.fileapi.demo.repo.UserRepo;
@@ -83,4 +85,46 @@ public class UserService implements UserDetailsService{
         this.userRepo.deleteById(id);
         return new UserDao(UserEnum.DELETED);
     }
+
+    /* change password */
+    public UserPasswordChangeResponseDto changePassword(
+        UserPasswordChangeRequestDto userPasswordChangeRequestDto
+    ){
+        UserPasswordChangeResponseDto userPasswordChangeResponseDto = 
+            new UserPasswordChangeResponseDto() ;
+        try {
+            /* search for creator with username */
+            Optional<User> creator = this.userRepo.findByName(
+                userPasswordChangeRequestDto.getUserName()
+            ); 
+
+            /* if creator does not exist 
+                set status as not found and return
+             */
+            if(creator.isEmpty()){
+                userPasswordChangeResponseDto.setStatus(UserEnum.NOT_FOUND);
+                return userPasswordChangeResponseDto ;
+            }
+
+            /* set new password */
+            creator.get().setPassword(
+                bCryptPasswordEncoder.encode(
+                    userPasswordChangeRequestDto.getPassword()
+                )
+            );
+
+            /* save model and return */
+            this.userRepo.save(creator.get()) ;
+            userPasswordChangeResponseDto.setUser(creator.get());
+            userPasswordChangeResponseDto.setStatus(UserEnum.UPDATED);
+            return userPasswordChangeResponseDto ;
+            
+        } catch (Exception e) {
+            userPasswordChangeResponseDto.setStatus(UserEnum.SERVER_ERROR);
+            return userPasswordChangeResponseDto ;
+        }
+
+
+    }
+
 }

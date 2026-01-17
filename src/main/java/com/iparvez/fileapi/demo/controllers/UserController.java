@@ -20,6 +20,8 @@ import com.iparvez.fileapi.demo.configs.UserConfig;
 import com.iparvez.fileapi.demo.dao.User.UserDao;
 import com.iparvez.fileapi.demo.dao.User.UserJwtDto;
 import com.iparvez.fileapi.demo.dao.User.UserLoginDto;
+import com.iparvez.fileapi.demo.dao.User.UserPasswordChangeRequestDto;
+import com.iparvez.fileapi.demo.dao.User.UserPasswordChangeResponseDto;
 import com.iparvez.fileapi.demo.dao.User.UserUpdateDto;
 import com.iparvez.fileapi.demo.enums.UserEnum;
 import com.iparvez.fileapi.demo.models.User;
@@ -125,7 +127,22 @@ public class UserController {
         
         // return entity;
     }
-    
+
+    // forgot password 
+    @PutMapping("/api/user/forgot_password")
+    public ResponseEntity<?> putMethodName(@RequestBody UserPasswordChangeRequestDto userPasswordChangeDto) {
+        try {
+            final UserPasswordChangeResponseDto userPasswordChangeResponseDto = 
+                this.userService.changePassword(userPasswordChangeDto) ;
+            return new ResponseEntity<>(userPasswordChangeResponseDto, HttpStatus.OK) ;
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_GATEWAY); 
+        }
+        
+        
+    }
+
+    // return the current profile
     @GetMapping("/api/user/me")
     public ResponseEntity<?> getCurrentUser(
         @AuthenticationPrincipal User user
