@@ -20,7 +20,7 @@ import lombok.Setter;
 public class Chunk {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private long id; 
 
-    @Column(nullable=false)
+    @Column(nullable=false, length = 5242880)
     @Getter @Setter
     @Lob private byte[] data; 
 

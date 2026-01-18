@@ -77,12 +77,11 @@ public class DirectoryController {
     }
 
     /* put mapping for updating read and write access */
-    @PutMapping("/api/dir/access/{userId}")
-    public String updateDirectoryAccess(@PathVariable String id, @RequestBody String entity) {
-        //TODO: process PUT request
+    // @PutMapping("/api/dir/access/{userId}")
+    // public String updateDirectoryAccess(@PathVariable String id, @RequestBody String entity) {
         
-        return entity;
-    }
+    //     return entity;
+    // }
 
     /* get all directory contents */
     @GetMapping("/api/dir/getContents")

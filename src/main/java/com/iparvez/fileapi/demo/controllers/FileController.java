@@ -1,24 +1,22 @@
 package com.iparvez.fileapi.demo.controllers;
 
-import java.util.HexFormat;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.iparvez.fileapi.demo.models.Chunk;
-import com.iparvez.fileapi.demo.models.File;
+import com.iparvez.fileapi.demo.dao.Chunk.SaveChunkRequestDao;
+import com.iparvez.fileapi.demo.dao.Chunk.SaveChunkResponseDao;
+import com.iparvez.fileapi.demo.dao.File.SaveFileMetaDataRequestDao;
+import com.iparvez.fileapi.demo.dao.File.SaveFileMetaDataResponseDao;
 import com.iparvez.fileapi.demo.models.User;
-import com.iparvez.fileapi.demo.services.ChunkService;
-import com.iparvez.fileapi.demo.services.FileService;
+import com.iparvez.fileapi.demo.services.FileMetadataService;
+import com.iparvez.fileapi.demo.services.FileUploadDownloadService;
 
 
 
@@ -26,13 +24,72 @@ import com.iparvez.fileapi.demo.services.FileService;
 @RestController
 @CrossOrigin
 public class FileController {
-    @Autowired private FileService fileService; 
-    @Autowired private ChunkService chunkService; 
+    @Autowired private FileMetadataService fileMetadataService ;
+    @Autowired private FileUploadDownloadService fileUploadDownloadService ;
+    
+    /* create file metadata */
+    @PostMapping("/api/file/create")
+    public ResponseEntity<?> createFile(
+        @RequestBody SaveFileMetaDataRequestDao saveFileMetaDataRequestDao, 
+        @AuthenticationPrincipal User user
+    ) {
+        try {
+            SaveFileMetaDataResponseDao saveFileMetaDataResponseDao = this.fileMetadataService.createFile(saveFileMetaDataRequestDao, user) ;
+            return new ResponseEntity<SaveFileMetaDataResponseDao>(
+                saveFileMetaDataResponseDao,
+                HttpStatus.OK
+            ) ;    
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_GATEWAY) ;
+        }
+        
+    }
 
-    // create custom functions for testing
+    /* upload chunk */
+    @PostMapping("/api/file/upload/{fileId}")
+    public ResponseEntity<?> uploadSingleChunk(
+        @PathVariable Long fileId, 
+        @RequestBody SaveChunkRequestDao saveChunkRequestDao
+    ) {
+        try {
+            SaveChunkResponseDao saveChunkResponseDao = this.fileUploadDownloadService.uploadSingleChunk(saveChunkRequestDao) ;
+            return new ResponseEntity<SaveChunkResponseDao>(
+                saveChunkResponseDao, 
+                HttpStatus.OK
+            ) ;
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_GATEWAY) ;
+        }
+    }
+    
+    
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /* old code - 
     private void testByteDownload(byte[] blob){
         // byte[] blobBytes = inputStream.readAllBytes();
         System.out.println(blob.length); 
@@ -121,6 +178,9 @@ public class FileController {
         }
 
     }
+    */
+
+    
     
     
     

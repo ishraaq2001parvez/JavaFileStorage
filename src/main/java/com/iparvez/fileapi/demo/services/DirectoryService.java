@@ -1,7 +1,6 @@
 package com.iparvez.fileapi.demo.services;
 
 import java.util.Optional;
-import java.util.TreeSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -66,8 +65,8 @@ public class DirectoryService {
             createdDirectory.setAccessType(directoryCreateClientDto.getAccessType());
             createdDirectory.setCreator(creator);
             createdDirectory.setParent(parent.get());
-            createdDirectory.setUsersGrantedRead(new TreeSet<User>());
-            createdDirectory.setUsersGrantedWrite(new TreeSet<User>());
+            // createdDirectory.setUsersGrantedRead(new TreeSet<User>());
+            // createdDirectory.setUsersGrantedWrite(new TreeSet<User>());
 
             /* save created directory */
             this.directoryRepo.save(createdDirectory) ;
@@ -95,8 +94,8 @@ public class DirectoryService {
             createdDirectory.setParent(null);
             createdDirectory.setName(creator.getUsername());
             createdDirectory.setCreator(creator);
-            createdDirectory.setUsersGrantedRead(new TreeSet<User>());
-            createdDirectory.setUsersGrantedWrite(new TreeSet<User>());
+            // createdDirectory.setUsersGrantedRead(new TreeSet<User>());
+            // createdDirectory.setUsersGrantedWrite(new TreeSet<User>());
             /* save created directory */
             this.directoryRepo.save(createdDirectory); 
             /* save dto */

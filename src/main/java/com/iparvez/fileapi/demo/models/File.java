@@ -1,5 +1,6 @@
 package com.iparvez.fileapi.demo.models;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -9,9 +10,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -42,14 +43,6 @@ public class File {
     @Column(name="mime", nullable = false, length = 20)
     @Getter @Setter private String mimeType; 
 
-    // file metadata object
-    @OneToOne
-    @JoinColumn(
-        name = "file_metadata", 
-        referencedColumnName = "id", 
-        nullable = false
-    )
-    @Getter @Setter private FileMetaData fileMetaData ;
 
     // map user creator
     @ManyToOne
@@ -71,10 +64,32 @@ public class File {
         joinColumns = @JoinColumn(name="file_id"),
         inverseJoinColumns = @JoinColumn(name ="id")
     )
-    @Getter @Setter private Set<User> usersGranted; 
+    @Getter @Setter private Set<User> usersGranted = new HashSet<>() ; 
 
     @ManyToOne
     @JoinColumn(name = "dir", referencedColumnName = "id")
-    @Getter @Setter private Directory dir;    
+    @Getter @Setter private Directory dir;   
+    
+    
+    /* metadata definitions */
+    // chunk count
+    @Column(name = "chunks")
+    @Getter @Setter private Integer chunkCount ;
+
+    
+    
+    // file header
+    @Lob
+    @Column(name = "file_header",  length = 100000)
+    @Getter @Setter private byte[] fileHeader; 
+
+    // file footer
+    @Lob
+    @Column(name = "file_footer", length = 100000)
+    @Getter @Setter private byte[] fileFooter; 
+
+    // file signature
+    @Column(name = "file_signature", length = 64, unique = true, nullable = false)
+    private String fileSignature; 
     
 }

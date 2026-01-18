@@ -1,5 +1,6 @@
 package com.iparvez.fileapi.demo.models;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.annotations.OnDelete;
@@ -74,7 +75,7 @@ public class Directory {
         joinColumns = @JoinColumn(name="dir_id"),
         inverseJoinColumns = @JoinColumn(name ="id")
     )
-    @Getter @Setter private Set<User> usersGrantedRead; 
+    @Getter @Setter private Set<User> usersGrantedRead = new HashSet<>(); 
     
 
     // define users who have  read access 
@@ -86,7 +87,7 @@ public class Directory {
         joinColumns = @JoinColumn(name="dir_id"),
         inverseJoinColumns = @JoinColumn(name ="id")
     )
-    @Getter @Setter private Set<User> usersGrantedWrite; 
+    @Getter @Setter private Set<User> usersGrantedWrite = new HashSet<>(); 
 
 
 }
