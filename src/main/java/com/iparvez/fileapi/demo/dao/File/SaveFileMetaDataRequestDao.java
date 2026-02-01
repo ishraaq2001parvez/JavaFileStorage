@@ -12,6 +12,6 @@ public class SaveFileMetaDataRequestDao {
     @Getter @Setter private byte[] fileHeader, fileFooter; 
 
     @Getter @Setter private Integer chunkCount, accessType ;
-    @Getter @Setter public Long dirId; 
+    @Getter @Setter private Long dirId; 
 
 }

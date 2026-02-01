@@ -40,7 +40,7 @@ public class File {
     @Getter @Setter private String extension;
     
     // mimeType used for saving file 
-    @Column(name="mime", nullable = false, length = 20)
+    @Column(name="mime", nullable = false, length = 255)
     @Getter @Setter private String mimeType; 
 
 
@@ -89,7 +89,7 @@ public class File {
     @Getter @Setter private byte[] fileFooter; 
 
     // file signature
-    @Column(name = "file_signature", length = 64, unique = true, nullable = false)
+    @Column(name = "file_signature", length = 64, nullable = false)
     private String fileSignature; 
     
 }

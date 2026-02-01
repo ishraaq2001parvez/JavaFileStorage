@@ -37,6 +37,11 @@ public class FileMetadataService {
                 saveFileMetaDataResponseDao.setStatus(FileEnum.NOT_ALLOWED);
                 return saveFileMetaDataResponseDao ;
             }
+
+            /* if file with name exists already */
+            /* todo : handle use case */
+
+            
             /* create new file object */
             File file = new File() ;
             /* set parameters according to items recieved */
