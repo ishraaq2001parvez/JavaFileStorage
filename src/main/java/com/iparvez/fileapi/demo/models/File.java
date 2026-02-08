@@ -66,6 +66,7 @@ public class File {
     )
     @Getter @Setter private Set<User> usersGranted = new HashSet<>() ; 
 
+    // directory of file; 
     @ManyToOne
     @JoinColumn(name = "dir", referencedColumnName = "id")
     @Getter @Setter private Directory dir;   

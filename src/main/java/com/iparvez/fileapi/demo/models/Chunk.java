@@ -31,5 +31,6 @@ public class Chunk {
     @Getter @Setter
     @ManyToOne
     @JoinColumn(name="fid", referencedColumnName="id", nullable=false)
+    
     private File file; 
 }
