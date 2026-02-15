@@ -12,12 +12,15 @@ import com.iparvez.fileapi.demo.enums.DirectoryEnum;
 import com.iparvez.fileapi.demo.models.Directory;
 import com.iparvez.fileapi.demo.models.User;
 import com.iparvez.fileapi.demo.repo.DirectoryRepo;
+import com.iparvez.fileapi.demo.repo.FileRepo;
 
 @Service
 public class DirectoryService {
 
-    
+    /* add directory repo for accessign directory table */
     @Autowired private DirectoryRepo directoryRepo;
+    /* add file repo for accessing file table */
+    @Autowired private FileRepo fileRepo ;
 
     /* check if directory exists already */
     public boolean checkIf_Directory_Exists_by_parentId_and_creatorId(
@@ -172,6 +175,13 @@ public class DirectoryService {
                     creatorId
                 )
             );
+
+            /* if files exist, retrieve files */
+            directoryGetAllFromParentDto.setFiles(
+                this.fileRepo.findByDirectoryId(
+                    parentDir.get().getDir_id()
+                )
+            );
             /* set status and return */
             directoryGetAllFromParentDto.setStatus(DirectoryEnum.FOUND);
             return directoryGetAllFromParentDto; 
@@ -200,6 +210,12 @@ public class DirectoryService {
                 this.directoryRepo.findAll_by_parentId_and_creatorId(
                     parentId, 
                     creatorId
+                )
+            );
+            /* if files exist, retrieve them */
+            directoryGetAllFromParentDto.setFiles(
+                this.fileRepo.findByDirectoryId(
+                    parentId
                 )
             );
             /* set the current directory */
